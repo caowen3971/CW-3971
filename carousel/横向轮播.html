@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<style>
+* {margin:0; padding:0; }
+li{list-style:none; }
+
+#div1 {width:850px; height:500px; margin:50px auto; overflow:hidden; position:relative;}
+#div1 ul{width: 4250px;height: 500px;position: absolute;left: 0;top: 0;transition: 1s}
+#div1 ul li{height:500px;float: left;}
+#div1>.ac{left: 0;}
+#div1 ol {position:absolute;right: 10%;bottom: 10px;}
+#div1 ol li{width: 20px;height: 20px;background: #fff;margin-left: 5px;float: left;line-height: 20px;text-align: center;cursor: pointer;}
+#div1 ol li.ac{background: red;color: #fff;}
+#div1>a{text-decoration: none;position: absolute;top: 50%;margin-top: -10px;height: 40px;line-height: 32px;text-align: center;width: 40px;font-size: 40px;vertical-align: middle;color: #fff;background: rgba(0,0,0,0.5);}
+#goPrev{left: 0;}
+#goNext{right: 0;}
+img{width:850px; height:500px;}
+</style>
+</head>
+
+<body>
+<div id="div1">
+	<ul class="ac">
+    	<li class="ac"><a href="javascript:alert(0);"><img src="1.jpg" /></a></li>
+    	<li><a href="javascript:alert(1);"><img src="2.jpg" /></a></li>
+    	<li><a href="javascript:alert(2);"><img src="3.jpg" /></a></li>
+    	<li><a href="javascript:alert(3);"><img src="4.jpg" /></a></li>
+    	<li><a href="javascript:alert(4);"><img src="5.jpg" /></a></li>
+    </ul>
+    <ol>
+    	<li class="ac">1</li>
+    	<li>2</li>
+    	<li>3</li>
+    	<li>4</li>
+    	<li>5</li>
+    </ol>
+    <a href="javascript:;" id="goPrev">&laquo;</a>
+    <a href="javascript:;" id="goNext">&raquo;</a>
+</div>
+<script>
+	class carousel {
+		constructor (selector) {
+			this.div = document.querySelector(selector);
+			this.ul = this.div.querySelector("ul");
+			this.btns = this.div.querySelector("ol").children;
+			this.goPrev = document.querySelector("#goPrev");
+			this.goNext = document.querySelector("#goNext");
+			this.index = 0; // 记录当前索引
+			this.lastIndex = 0; // 记录上一次的索引
+			this.timer = null;
+			this.init();
+		}
+		init () {
+			this.btnClick();
+			this.goNextClick();
+			this.goPrevClick ();
+			this.autoPlay ();
+			this.enterStop ();
+			this.leaveStart ();
+		}
+		
+		btnClick (){
+			Array.from(this.btns).forEach((btn, i) => {
+				btn.onclick =  () => {
+					this.index = i;// 现在的索引
+					//this.ul.style.left = -850 * i + "px"; 
+					this.changeImg();
+				}
+			})
+		}
+		
+		goNextClick (){
+			this.goNext.onclick =  () => {
+				this.index++;
+				if(this.index === this.btns.length) this.index = 0; 
+				//if(++this.index === this.btns.length) this.index=0;
+				this.changeImg();
+			}
+		}
+		
+		goPrevClick (){
+			this.goPrev.onclick = () => {
+				this.index--;
+				if(this.index < 0) this.index = this.btns.length-1; 
+				//if(--this.index < 0) this.index = this.btns.length-1;
+				this.changeImg();
+			}
+		}
+		
+		autoPlay () {
+
+			this.timer = setInterval( () => {
+				// 每隔两秒自动调用点击函数
+				console.log(this);
+				this.goNext.onclick();
+			},2000);
+		}
+		
+		enterStop () {
+			this.div.onmouseenter = () => {
+				clearInterval(this.timer);
+			}
+		}
+		
+		leaveStart () {
+			this.div.onmouseleave = () => {
+				this.autoPlay ();
+			}
+		}
+		
+		changeImg () {
+		console.log(this.index, this.lastIndex);
+		// 把之前的按钮的ac去掉
+		this.btns[this.lastIndex].classList.remove("ac");
+		// 给自己加上ac
+		this.btns[this.index].classList.add("ac");
+		// 往前走一步(现任变前任)
+		this.ul.style.left = -850 * this.index + "px";
+		this.lastIndex = this.index;
+		}
+	}
+	
+	new carousel ("#div1");
+</script>
+</body>
+</html>
